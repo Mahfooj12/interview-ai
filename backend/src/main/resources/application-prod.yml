@@ -1,0 +1,9 @@
+spring:
+  data:
+    mongodb:
+      auto-index-creation: false
+
+logging:
+  level:
+    root: WARN
+    com.interviewai: INFO

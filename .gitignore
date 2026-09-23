@@ -1,0 +1,54 @@
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+
+# ---------- IDE ----------
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# ---------- Java / Maven ----------
+backend/target/
+*.class
+*.jar
+*.war
+*.log
+hs_err_pid*
+
+# ---------- Node / Next.js ----------
+node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.env.local
+frontend/.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---------- Environment ----------
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# ---------- Docker ----------
+docker-compose.override.yml
+
+# ---------- Uploads ----------
+uploads/
+*.tmp
+
+# ---------- Test ----------
+coverage/
+*.exec
+
+# ---------- Misc ----------
+*.pid
+*.seed
+*.pid.lock

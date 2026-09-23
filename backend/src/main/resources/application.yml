@@ -1,0 +1,94 @@
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: interviewai-backend
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${MONGODB_DATABASE:interviewai}
+      auto-index-creation: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${FILE_MAX_SIZE_BYTES:10485760}
+      max-request-size: ${FILE_MAX_SIZE_BYTES:10485760}
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+  api-docs:
+    path: /v3/api-docs
+
+app:
+  speech:
+  provider: ${SPEECH_PROVIDER:none}     # none | deepgram | openai
+  deepgram:
+    api-key: ${DEEPGRAM_API_KEY:}
+    base-url: ${DEEPGRAM_BASE_URL:https://api.deepgram.com}
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+    model: ${OPENAI_TTS_MODEL:tts-1}
+  voice:
+    default-language: ${VOICE_DEFAULT_LANGUAGE:en}
+  interview:
+    max-questions: ${INTERVIEW_MAX_QUESTIONS:15}
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiration-ms: ${JWT_ACCESS_TOKEN_EXPIRATION_MS:900000}
+    refresh-token-expiration-ms: ${JWT_REFRESH_TOKEN_EXPIRATION_MS:604800000}
+    issuer: interviewai
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+  file:
+    max-size-bytes: ${FILE_MAX_SIZE_BYTES:10485760}
+  storage:
+    provider: ${STORAGE_PROVIDER:cloudinary}
+    cloudinary:
+      cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+      api-key: ${CLOUDINARY_API_KEY:}
+      api-secret: ${CLOUDINARY_API_SECRET:}
+  ai:
+    provider: ${AI_PROVIDER:deepseek}          # deepseek | gemini
+    deepseek:
+      api-key: ${DEEPSEEK_API_KEY:}
+      base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+      model: ${DEEPSEEK_MODEL:deepseek-chat}
+      timeout-seconds: 90
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+      model: ${GEMINI_MODEL:gemini-flash-lite-latest}
+  logging:
+    level:
+      root: INFO
+      com.interviewai: DEBUG
+      org.springframework.security: INFO

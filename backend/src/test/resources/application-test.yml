@@ -1,0 +1,37 @@
+server:
+  port: 0
+
+spring:
+  data:
+    mongodb:
+      uri: ${TEST_MONGODB_URI:mongodb://localhost:27017/interviewai_test}
+      database: interviewai_test
+      auto-index-creation: true
+
+app:
+  jwt:
+    secret: dGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQtdGVzdC1zZWNyZXQ=
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 604800000
+    issuer: interviewai-test
+  cors:
+    allowed-origins: http://localhost:3000
+  file:
+    max-size-bytes: 10485760
+  storage:
+    provider: local
+  ai:
+    deepseek:
+      api-key: test-key
+      base-url: https://api.deepseek.com
+      model: deepseek-chat
+      timeout-seconds: 10
+  speech:
+    provider: none
+  interview:
+    max-questions: 5
+
+logging:
+  level:
+    root: WARN
+    com.interviewai: INFO

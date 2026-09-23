@@ -1,0 +1,16 @@
+Job Title: Senior Backend Engineer
+Company: Acme Corp
+
+Required Skills
+- Java 17+
+- Spring Boot
+- MongoDB
+- Kafka
+
+Preferred Skills
+- Kubernetes
+- Redis
+
+Responsibilities
+- Design and build scalable backend services
+- Mentor junior engineers

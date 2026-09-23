@@ -1,0 +1,16 @@
+Jane Doe
+jane.doe@example.com | +1-555-0100
+
+Summary
+Backend engineer with 4 years of experience building distributed systems in Java.
+
+Skills
+Java, Spring Boot, MongoDB, Redis, Kafka, Docker, Kubernetes
+
+Projects
+- Order Service (Java, Spring Boot, Kafka)
+  Built a highly available order processing service handling 10k TPS.
+
+Experience
+- Senior Engineer at Acme Corp (2021 - Present)
+  Led migration from monolith to microservices.
