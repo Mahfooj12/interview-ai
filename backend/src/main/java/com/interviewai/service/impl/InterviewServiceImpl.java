@@ -37,6 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import com.interviewai.dto.common.CursorPage;
+import com.interviewai.dto.interview.InterviewPageRequest;
+import com.interviewai.util.CursorCodec;
+import org.springframework.data.domain.PageRequest;
+
+
 
 import java.time.Duration;
 import java.time.Instant;
@@ -62,6 +68,34 @@ public class InterviewServiceImpl implements InterviewService {
     private final AiUsageRepository aiUsageRepository;
     private final CommunicationAnalyzer communicationAnalyzer;
     private final ReportService reportService;
+    // private final CursorCodec cursorCodec;
+
+    // public InterviewServiceImpl(InterviewSessionRepository interviewRepository,
+    //                             QuestionRepository questionRepository,
+    //                             AnswerRepository answerRepository,
+    //                             EvaluationRepository evaluationRepository,
+    //                             ResumeRepository resumeRepository,
+    //                             JobDescriptionRepository jobRepository,
+    //                             AIService aiService,
+    //                             AdaptiveEngine adaptiveEngine,
+    //                             InterviewMapper mapper,
+    //                             AiUsageRepository aiUsageRepository,
+    //                             CommunicationAnalyzer communicationAnalyzer,
+    //                             @Lazy ReportService reportService) {
+    //     this.interviewRepository = interviewRepository;
+    //     this.questionRepository = questionRepository;
+    //     this.answerRepository = answerRepository;
+    //     this.evaluationRepository = evaluationRepository;
+    //     this.resumeRepository = resumeRepository;
+    //     this.jobRepository = jobRepository;
+    //     this.aiService = aiService;
+    //     this.adaptiveEngine = adaptiveEngine;
+    //     this.mapper = mapper;
+    //     this.aiUsageRepository = aiUsageRepository;
+    //     this.communicationAnalyzer = communicationAnalyzer;
+    //     this.reportService = reportService;
+    // }
+    private final CursorCodec cursorCodec;
 
     public InterviewServiceImpl(InterviewSessionRepository interviewRepository,
                                 QuestionRepository questionRepository,
@@ -74,6 +108,7 @@ public class InterviewServiceImpl implements InterviewService {
                                 InterviewMapper mapper,
                                 AiUsageRepository aiUsageRepository,
                                 CommunicationAnalyzer communicationAnalyzer,
+                                CursorCodec cursorCodec,
                                 @Lazy ReportService reportService) {
         this.interviewRepository = interviewRepository;
         this.questionRepository = questionRepository;
@@ -86,7 +121,45 @@ public class InterviewServiceImpl implements InterviewService {
         this.mapper = mapper;
         this.aiUsageRepository = aiUsageRepository;
         this.communicationAnalyzer = communicationAnalyzer;
+        this.cursorCodec = cursorCodec;
         this.reportService = reportService;
+    }
+    
+    @Override
+    public CursorPage<InterviewSummaryResponse> listPaginated(String userId, InterviewPageRequest request) {
+        int limit = request.effectiveLimit();
+        // Request one extra item to detect hasMore without a count query.
+        PageRequest pageRequest = PageRequest.of(0, limit + 1);
+
+        List<InterviewSession> raw;
+        if (request.getCursor() == null || request.getCursor().isBlank()) {
+            raw = interviewRepository.findFirstPage(userId, pageRequest);
+        } else {
+            CursorCodec.DecodedCursor cursor = cursorCodec.decode(request.getCursor());
+            raw = interviewRepository.findAfterCursor(
+                    userId, cursor.startedAt(), cursor.id(), pageRequest
+            );
+        }
+
+        boolean hasMore = raw.size() > limit;
+        List<InterviewSession> pageItems = hasMore ? raw.subList(0, limit) : raw;
+
+        String nextCursor = null;
+        if (hasMore && !pageItems.isEmpty()) {
+            InterviewSession last = pageItems.get(pageItems.size() - 1);
+            nextCursor = cursorCodec.encode(last.getStartedAt(), last.getId());
+        }
+
+        List<InterviewSummaryResponse> items = pageItems.stream()
+                .map(mapper::toSummary)
+                .toList();
+
+        return CursorPage.<InterviewSummaryResponse>builder()
+                .items(items)
+                .nextCursor(nextCursor)
+                .hasMore(hasMore)
+                .limit(limit)
+                .build();
     }
 
     // ------------------------------------------------------------------

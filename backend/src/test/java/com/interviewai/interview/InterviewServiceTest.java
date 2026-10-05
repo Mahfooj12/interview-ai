@@ -1,5 +1,6 @@
 package com.interviewai.interview;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.interviewai.ai.AIService;
 import com.interviewai.analytics.CommunicationAnalyzer;
 import com.interviewai.dto.interview.AnswerRequest;
@@ -26,6 +27,11 @@ import com.interviewai.service.AdaptiveEngine;
 //import com.interviewai.service.InterviewService;
 import com.interviewai.service.ReportService;
 import com.interviewai.service.impl.InterviewServiceImpl;
+import com.interviewai.util.CursorCodec;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.interviewai.util.CursorCodec;
+
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +72,9 @@ class InterviewServiceTest {
                 interviewRepository, questionRepository, answerRepository,
                 evaluationRepository, resumeRepository, jobRepository,
                 aiService, adaptiveEngine, new InterviewMapper(),
-                aiUsageRepository, communicationAnalyzer, reportService);
+                aiUsageRepository, communicationAnalyzer,
+                new CursorCodec(new ObjectMapper()),
+                reportService);
     }
 
     @Test

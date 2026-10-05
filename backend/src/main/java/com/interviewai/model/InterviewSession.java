@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
@@ -16,7 +15,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "interviewSessions")
-@CompoundIndex(name = "user_status_started_idx", def = "{'userId': 1, 'status': 1, 'startedAt': -1}")
+@CompoundIndex(
+        name = "user_started_id_idx",
+        def = "{'userId': 1, 'startedAt': -1, '_id': -1}"
+)
 @Getter
 @Setter
 @Builder
@@ -33,7 +35,6 @@ public class InterviewSession extends BaseAudit {
     @Id
     private String id;
 
-    @Indexed
     private String userId;
 
     private String resumeId;

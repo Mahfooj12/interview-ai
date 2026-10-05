@@ -1,8 +1,10 @@
 package com.interviewai.service;
 
+import com.interviewai.dto.common.CursorPage;
 import com.interviewai.dto.interview.AnswerRequest;
 import com.interviewai.dto.interview.AnswerResponse;
 import com.interviewai.dto.interview.CreateInterviewRequest;
+import com.interviewai.dto.interview.InterviewPageRequest;
 import com.interviewai.dto.interview.InterviewResponse;
 import com.interviewai.dto.interview.InterviewStateResponse;
 import com.interviewai.dto.interview.InterviewSummaryResponse;
@@ -16,6 +18,9 @@ public interface InterviewService {
     InterviewResponse create(String userId, CreateInterviewRequest request);
 
     List<InterviewSummaryResponse> list(String userId);
+
+    /** New paginated list. */
+    CursorPage<InterviewSummaryResponse> listPaginated(String userId, InterviewPageRequest request);
 
     InterviewResponse get(String userId, String interviewId);
 

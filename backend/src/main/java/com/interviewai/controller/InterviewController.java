@@ -1,8 +1,10 @@
 package com.interviewai.controller;
 
+import com.interviewai.dto.common.CursorPage;
 import com.interviewai.dto.interview.AnswerRequest;
 import com.interviewai.dto.interview.AnswerResponse;
 import com.interviewai.dto.interview.CreateInterviewRequest;
+import com.interviewai.dto.interview.InterviewPageRequest;
 import com.interviewai.dto.interview.InterviewResponse;
 import com.interviewai.dto.interview.InterviewStateResponse;
 import com.interviewai.dto.interview.InterviewSummaryResponse;
@@ -20,9 +22,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/interviews")
@@ -45,10 +46,21 @@ public class InterviewController {
     }
 
     @GetMapping
-    @Operation(summary = "List the current user's interviews")
-    public ResponseEntity<ApiResponse<List<InterviewSummaryResponse>>> list(
-            @AuthenticationPrincipal CustomUserDetails user) {
-        return ResponseEntity.ok(ApiResponse.ok(interviewService.list(user.getId())));
+    @Operation(summary = "List the current user's interviews (cursor-paginated)")
+    public ResponseEntity<ApiResponse<CursorPage<InterviewSummaryResponse>>> list(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestParam(name = "limit", required = false) Integer limit,
+            @RequestParam(name = "cursor", required = false) String cursor) {
+
+        InterviewPageRequest pageRequest = InterviewPageRequest.builder()
+                .limit(limit)
+                .cursor(cursor)
+                .build();
+
+        CursorPage<InterviewSummaryResponse> page =
+                interviewService.listPaginated(user.getId(), pageRequest);
+
+        return ResponseEntity.ok(ApiResponse.ok(page));
     }
 
     @GetMapping("/{id}")
