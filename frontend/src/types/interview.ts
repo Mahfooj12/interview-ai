@@ -47,6 +47,13 @@ export interface InterviewState {
   completed: boolean;
   lastUpdatedAt: string | null;
 }
+/** Generic cursor-paginated response from the backend. */
+export interface CursorPage<T> {
+  items: T[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  limit: number;
+}
 
 export interface InterviewResponse {
   id: string;

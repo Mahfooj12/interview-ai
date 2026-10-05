@@ -4,6 +4,7 @@ import type {
   AnswerRequest,
   AnswerResponse,
   CreateInterviewRequest,
+  CursorPage,
   InterviewResponse,
   InterviewSummary,
   NextQuestionResponse,
@@ -13,6 +14,22 @@ export const interviewApi = {
   async list(): Promise<InterviewSummary[]> {
     const { data } =
       await apiClient.get<ApiResponse<InterviewSummary[]>>("/api/interviews");
+    return data.data;
+  },
+  // Append inside the interviewApi object:
+
+  async listPaginated(params?: {
+    limit?: number;
+    cursor?: string | null;
+  }): Promise<CursorPage<InterviewSummary>> {
+    const { data } = await apiClient.get<
+      ApiResponse<CursorPage<InterviewSummary>>
+    >("/api/interviews", {
+      params: {
+        limit: params?.limit,
+        cursor: params?.cursor ?? undefined,
+      },
+    });
     return data.data;
   },
 
