@@ -1,6 +1,8 @@
 package com.interviewai.repository;
 
 import com.interviewai.model.InterviewSession;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -64,4 +66,5 @@ public interface InterviewSessionRepository extends MongoRepository<InterviewSes
             String id,
             org.springframework.data.domain.Pageable pageable
     );
+    Page<InterviewSession> findAllBy(Pageable pageable);
 }

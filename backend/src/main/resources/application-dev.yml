@@ -3,7 +3,37 @@ spring:
     mongodb:
       auto-index-creation: true
 
+cache:
+  redis:
+    enabled: true
+    progress-ttl-seconds: 60
+
 logging:
   level:
     com.interviewai: DEBUG
     org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    # org.springframework.data.redis: DEBUG
+    # io.lettuce.core: DEBUG
+    # org.springframework.boot.autoconfigure.data.redis: DEBUG
+
+rate-limit:
+  enabled: true
+  tiers:
+    AUTH:
+      capacity: 100
+      window-seconds: 900
+    AI_HEAVY:
+      capacity: 100
+      window-seconds: 3600
+    AI_NORMAL:
+      capacity: 200
+      window-seconds: 3600
+    UPLOAD:
+      capacity: 100
+      window-seconds: 3600
+    VOICE:
+      capacity: 200
+      window-seconds: 3600
+    GLOBAL:
+      capacity: 2000
+      window-seconds: 3600

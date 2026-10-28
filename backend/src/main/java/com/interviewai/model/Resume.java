@@ -13,6 +13,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "resumes")
 @CompoundIndex(name = "user_created_idx", def = "{'userId': 1, 'createdAt': -1}")
+@CompoundIndex(
+        name = "user_primary_resume_idx",
+        def = "{'userId': 1, 'primaryResume': 1}",
+        partialFilter = "{'primaryResume': true}"
+)
 @Getter
 @Setter
 @Builder
@@ -28,7 +33,7 @@ public class Resume extends BaseAudit {
 
     private String fileName;
     private String fileUrl;
-    private String fileType; // PDF | DOCX
+    private String fileType;
     private long fileSize;
 
     private String rawText;

@@ -1,5 +1,6 @@
 package com.interviewai.service.impl;
 
+import com.interviewai.dto.common.PageResponse;
 import com.interviewai.dto.evaluation.EvaluationResponse;
 import com.interviewai.dto.evaluation.InterviewEvaluationsResponse;
 import com.interviewai.exception.ResourceNotFoundException;
@@ -8,6 +9,9 @@ import com.interviewai.model.Evaluation;
 import com.interviewai.repository.EvaluationRepository;
 import com.interviewai.repository.InterviewSessionRepository;
 import com.interviewai.service.EvaluationService;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +29,17 @@ public class EvaluationServiceImpl implements EvaluationService {
         this.evaluationRepository = evaluationRepository;
         this.interviewRepository = interviewRepository;
         this.mapper = mapper;
+    }
+    @Override
+    public PageResponse<EvaluationResponse> listForInterviewPaged(
+            String userId, String interviewId, Pageable pageable) {
+
+        // verify ownership
+        interviewRepository.findByIdAndUserId(interviewId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Interview not found"));
+
+        Page<Evaluation> page = evaluationRepository.findAllByInterviewId(interviewId, pageable);
+        return PageResponse.from(page, mapper::toResponse);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.interviewai.repository;
 
 import com.interviewai.model.AiUsage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -18,6 +20,8 @@ public interface AiUsageRepository extends MongoRepository<AiUsage, String> {
     default List<AiUsage> findAllByUserIdOrderByCreatedAtDesc(String userId) {
         return findAllByUserId(userId, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
+
+    Page<AiUsage> findAllByCreatedAtAfter(Instant after, Pageable pageable);
 
     List<AiUsage> findAllByCreatedAtAfter(Instant after);
 

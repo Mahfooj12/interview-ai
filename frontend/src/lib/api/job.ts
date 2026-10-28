@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api/client";
 import type { ApiResponse } from "@/lib/api/types";
+import type { PageResponse, PaginationParams } from "@/types/pagination";
 import type {
   JobCreateTextPayload,
   JobDescriptionResponse,
@@ -8,9 +9,17 @@ import type {
 } from "@/types/job";
 
 export const jobApi = {
-  async list(): Promise<JobDescriptionSummary[]> {
-    const { data } =
-      await apiClient.get<ApiResponse<JobDescriptionSummary[]>>("/api/jobs");
+  async list(params: PaginationParams = {}): Promise<PageResponse<JobDescriptionSummary>> {
+    const { data } = await apiClient.get<ApiResponse<PageResponse<JobDescriptionSummary>>>(
+      "/api/jobs",
+      {
+        params: {
+          page: params.page ?? 0,
+          size: params.size ?? 20,
+          sort: params.sort ?? "createdAt,desc",
+        },
+      },
+    );
     return data.data;
   },
 

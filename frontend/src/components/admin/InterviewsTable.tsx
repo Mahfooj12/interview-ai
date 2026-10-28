@@ -1,10 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Pagination } from "@/components/ui/pagination";
 import { useAdminInterviews } from "@/hooks/useAdmin";
 import type { InterviewStatus } from "@/types/interview";
+
+const PAGE_SIZE = 50;
 
 const statusVariant: Record<
   InterviewStatus,
@@ -17,7 +21,11 @@ const statusVariant: Record<
 };
 
 export function InterviewsTable() {
-  const { data, isLoading } = useAdminInterviews(100);
+  const [page, setPage] = useState(0);
+  const { data, isLoading, isPlaceholderData } = useAdminInterviews(
+    page,
+    PAGE_SIZE,
+  );
 
   if (isLoading) {
     return (
@@ -28,48 +36,61 @@ export function InterviewsTable() {
     );
   }
 
-  if (!data || data.length === 0) {
+  if (!data || data.content.length === 0) {
     return <p className="text-sm text-muted-foreground">No interviews yet.</p>;
   }
 
   return (
-    <Card>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-muted/40">
-              <tr className="text-left">
-                <th className="p-3 font-medium">User</th>
-                <th className="p-3 font-medium">Type</th>
-                <th className="p-3 font-medium">Mode</th>
-                <th className="p-3 font-medium">Difficulty</th>
-                <th className="p-3 font-medium">Questions</th>
-                <th className="p-3 font-medium">Avg score</th>
-                <th className="p-3 font-medium">Status</th>
-                <th className="p-3 font-medium">Started</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((i) => (
-                <tr key={i.id} className="border-b last:border-b-0">
-                  <td className="p-3">{i.userEmail ?? i.userId}</td>
-                  <td className="p-3">{i.type.replace("_", " ")}</td>
-                  <td className="p-3">{i.mode}</td>
-                  <td className="p-3">{i.difficulty}</td>
-                  <td className="p-3">{i.totalQuestionsAsked}</td>
-                  <td className="p-3">{Math.round(i.cumulativeScore)}</td>
-                  <td className="p-3">
-                    <Badge variant={statusVariant[i.status]}>{i.status}</Badge>
-                  </td>
-                  <td className="p-3 text-xs text-muted-foreground">
-                    {i.startedAt ? new Date(i.startedAt).toLocaleString() : "—"}
-                  </td>
+    <div className={isPlaceholderData ? "opacity-60 transition-opacity" : ""}>
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-muted/40">
+                <tr className="text-left">
+                  <th className="p-3 font-medium">User</th>
+                  <th className="p-3 font-medium">Type</th>
+                  <th className="p-3 font-medium">Mode</th>
+                  <th className="p-3 font-medium">Difficulty</th>
+                  <th className="p-3 font-medium">Questions</th>
+                  <th className="p-3 font-medium">Avg score</th>
+                  <th className="p-3 font-medium">Status</th>
+                  <th className="p-3 font-medium">Started</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+              </thead>
+              <tbody>
+                {data.content.map((i) => (
+                  <tr key={i.id} className="border-b last:border-b-0">
+                    <td className="p-3">{i.userEmail ?? i.userId}</td>
+                    <td className="p-3">{i.type.replace("_", " ")}</td>
+                    <td className="p-3">{i.mode}</td>
+                    <td className="p-3">{i.difficulty}</td>
+                    <td className="p-3">{i.totalQuestionsAsked}</td>
+                    <td className="p-3">{Math.round(i.cumulativeScore)}</td>
+                    <td className="p-3">
+                      <Badge variant={statusVariant[i.status]}>{i.status}</Badge>
+                    </td>
+                    <td className="p-3 text-xs text-muted-foreground">
+                      {i.startedAt
+                        ? new Date(i.startedAt).toLocaleString()
+                        : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Pagination
+        page={data.page}
+        totalPages={data.totalPages}
+        totalElements={data.totalElements}
+        size={data.size}
+        onPageChange={setPage}
+      />
+    </div>
   );
 }
+

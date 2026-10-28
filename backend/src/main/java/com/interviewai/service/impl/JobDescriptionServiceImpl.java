@@ -1,6 +1,7 @@
 package com.interviewai.service.impl;
 
 import com.interviewai.ai.AIService;
+import com.interviewai.dto.common.PageResponse;
 import com.interviewai.dto.job.JobDescriptionRequest;
 import com.interviewai.dto.job.JobDescriptionResponse;
 import com.interviewai.dto.job.JobDescriptionSummaryResponse;
@@ -23,9 +24,12 @@ import com.interviewai.service.JobDescriptionService;
 import com.interviewai.service.ResumeService;
 import com.interviewai.storage.StorageService;
 import com.interviewai.util.Constants;
+import org.springframework.data.domain.Pageable;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,6 +72,8 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
         this.aiUsageRepository = aiUsageRepository;
     }
 
+    
+
     @Override
     public JobDescriptionResponse createFromText(String userId, JobDescriptionRequest request) {
         long start = System.currentTimeMillis();
@@ -92,6 +98,12 @@ public class JobDescriptionServiceImpl implements JobDescriptionService {
 
         log.info("Job description created id={} userId={}", jd.getId(), userId);
         return mapper.toResponse(jd);
+    }
+    @Override
+    public PageResponse<JobDescriptionSummaryResponse> listPaged(String userId, Pageable pageable) {
+        Page<com.interviewai.model.JobDescription> page =
+                jobRepository.findAllByUserId(userId, pageable);
+        return PageResponse.from(page, mapper::toSummary);
     }
 
     @Override

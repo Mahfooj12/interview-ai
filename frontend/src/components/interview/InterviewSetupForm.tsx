@@ -177,7 +177,7 @@ export function InterviewSetupForm() {
                       {...field}
                     >
                       <option value="">None</option>
-                      {jobs?.map((j) => (
+                      {jobs?.content?.map((j) => (
                         <option key={j.id} value={j.id}>
                           {j.title ?? "Untitled"} {j.company ? `@ ${j.company}` : ""}
                         </option>

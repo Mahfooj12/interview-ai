@@ -1,5 +1,9 @@
 package com.interviewai.service.impl;
 
+import org.springframework.cache.annotation.CacheEvict;
+import com.interviewai.dto.common.PageResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import com.interviewai.ai.AIService;
 import com.interviewai.dto.report.GenerateReportResponse;
 import com.interviewai.dto.report.ReportResponse;
@@ -68,11 +72,22 @@ public class ReportServiceImpl implements ReportService {
         this.reportMapper = reportMapper;
         this.aiUsageRepository = aiUsageRepository;
     }
-
+    
+    @Override
+    public PageResponse<ReportSummaryResponse> listPaged(String userId, Pageable pageable) {
+        Page<com.interviewai.model.Report> page =
+                reportRepository.findAllByUserId(userId, pageable);
+        return PageResponse.from(page, reportMapper::toSummary);
+    }
     // ------------------------------------------------------------------
     // GENERATE
     // ------------------------------------------------------------------
     @Override
+    @CacheEvict(
+        cacheNames = "progress",
+        key = "'user:' + #userId",
+        condition = "#result != null && #result.generated"
+    )
     public GenerateReportResponse generate(String userId, String interviewId, boolean force) {
         InterviewSession session = interviewRepository.findByIdAndUserId(interviewId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Interview not found"));

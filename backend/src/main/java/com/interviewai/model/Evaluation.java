@@ -16,6 +16,7 @@ import java.util.List;
 
 @Document(collection = "evaluations")
 @CompoundIndex(name = "interview_question_eval_idx", def = "{'interviewId': 1, 'questionId': 1}")
+@CompoundIndex(name = "user_eval_created_idx", def = "{'userId': 1, 'createdAt': -1}")
 @Getter
 @Setter
 @Builder

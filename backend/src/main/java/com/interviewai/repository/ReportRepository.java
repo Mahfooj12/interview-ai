@@ -1,6 +1,8 @@
 package com.interviewai.repository;
 
 import com.interviewai.model.Report;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -14,6 +16,9 @@ public interface ReportRepository extends MongoRepository<Report, String> {
 
     @Query("{ 'userId': ?0 }")
     List<Report> findAllByUserId(String userId, Sort sort);
+
+    @Query("{ 'userId': ?0 }")
+    Page<Report> findAllByUserId(String userId, Pageable pageable);
 
     default List<Report> findAllByUserIdOrderByGeneratedAtDesc(String userId) {
         return findAllByUserId(userId, Sort.by(Sort.Direction.DESC, "generatedAt"));

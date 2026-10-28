@@ -14,22 +14,74 @@ spring:
     name: interviewai-backend
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
+  
   data:
     mongodb:
       uri: ${MONGODB_URI}
       database: ${MONGODB_DATABASE:interviewai}
       auto-index-creation: true
+    
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3000ms
+      connect-timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 3000ms
+        shutdown-timeout: 100ms
+      ssl:
+        enabled: ${REDIS_SSL:false}
+
   servlet:
     multipart:
       enabled: true
       max-file-size: ${FILE_MAX_SIZE_BYTES:10485760}
       max-request-size: ${FILE_MAX_SIZE_BYTES:10485760}
+      
   jackson:
     default-property-inclusion: non_null
     serialization:
       write-dates-as-timestamps: false
     deserialization:
       fail-on-unknown-properties: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 2147483647
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        delivery.timeout.ms: 120000
+        linger.ms: 5
+        compression.type: snappy
+    
+    consumer:
+      group-id: interview-generation-consumers
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      max-poll-records: 1
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.interviewai.dto.kafka
+        spring.json.value.default.type: com.interviewai.dto.kafka.InterviewGenerationMessage
+        spring.json.use.type.headers: false
+        isolation.level: read_committed
+    
+    listener:
+      ack-mode: manual_immediate
+      concurrency: 3
+      type: single
 
 management:
   endpoints:
@@ -39,11 +91,12 @@ management:
   endpoint:
     health:
       show-details: when_authorized
+      
 logging:
-    level:
-      root: INFO
-      com.interviewai: DEBUG
-      org.springframework.security: INFO
+  level:
+    root: INFO
+    com.interviewai: DEBUG
+    org.springframework.security: INFO
       
 springdoc:
   swagger-ui:
@@ -51,6 +104,34 @@ springdoc:
     operationsSorter: method
   api-docs:
     path: /v3/api-docs
+
+rate-limit:
+  enabled: ${RATE_LIMIT_ENABLED:true}
+  trust-forwarded-for: true
+  tiers:
+    AUTH:
+      capacity: 20
+      window-seconds: 900
+    AI_HEAVY:
+      capacity: 15
+      window-seconds: 3600
+    AI_NORMAL:
+      capacity: 60
+      window-seconds: 3600
+    UPLOAD:
+      capacity: 20
+      window-seconds: 3600
+    VOICE:
+      capacity: 60
+      window-seconds: 3600
+    GLOBAL:
+      capacity: 600
+      window-seconds: 3600 
+ 
+cache:
+  redis:
+    enabled: ${CACHE_REDIS_ENABLED:true}
+    progress-ttl-seconds: ${CACHE_PROGRESS_TTL:120}
 
 app:
   speech:
@@ -64,6 +145,22 @@ app:
       model: ${OPENAI_TTS_MODEL:tts-1}
   voice:
     default-language: ${VOICE_DEFAULT_LANGUAGE:en}
+  
+  # Kafka Config (Matching with KafkaConfig.java)
+  kafka:
+    topic:
+      interview-generation: interview-generation
+    retry:
+      max-attempts: 3
+      backoff-ms: 2000
+  
+  async:
+    core-pool-size: ${ASYNC_CORE_POOL:4}
+    max-pool-size: ${ASYNC_MAX_POOL:8}
+    queue-capacity: ${ASYNC_QUEUE_CAPACITY:100}
+    stuck-job-threshold-seconds: ${ASYNC_STUCK_THRESHOLD:300}
+    reaper-interval-ms: ${ASYNC_REAPER_INTERVAL:60000}
+
   interview:
     max-questions: ${INTERVIEW_MAX_QUESTIONS:15}
   jwt:
@@ -82,7 +179,7 @@ app:
       api-key: ${CLOUDINARY_API_KEY:}
       api-secret: ${CLOUDINARY_API_SECRET:}
   ai:
-    provider: ${AI_PROVIDER:deepseek}          # deepseek | gemini
+    provider: ${AI_PROVIDER:deepseek}
     deepseek:
       api-key: ${DEEPSEEK_API_KEY:}
       base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}

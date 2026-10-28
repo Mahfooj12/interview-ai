@@ -8,13 +8,15 @@ import type { JobCreateTextPayload } from "@/types/job";
 
 export const jobKeys = {
   all: ["jobs"] as const,
+  list: (page: number, size: number) => ["jobs", "list", page, size] as const,
   detail: (id: string) => ["jobs", id] as const,
 };
 
-export function useJobs() {
+export function useJobs(page = 0, size = 20) {
   return useQuery({
-    queryKey: jobKeys.all,
-    queryFn: jobApi.list,
+    queryKey: jobKeys.list(page, size),
+    queryFn: () => jobApi.list({ page, size }),
+    placeholderData: (prev) => prev,
   });
 }
 

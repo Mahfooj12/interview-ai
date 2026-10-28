@@ -1,5 +1,6 @@
 package com.interviewai.service.impl;
 
+import org.springframework.cache.annotation.Cacheable;
 import com.interviewai.dto.progress.ProgressPointResponse;
 import com.interviewai.dto.progress.ProgressSkillResponse;
 import com.interviewai.dto.progress.ProgressSummaryResponse;
@@ -34,6 +35,11 @@ public class ProgressServiceImpl implements ProgressService {
     }
 
     @Override
+    @Cacheable(
+        cacheNames = "progress",
+        key = "'user:' + #userId",
+        unless = "#result == null"
+    )
     public ProgressSummaryResponse summary(String userId) {
         List<InterviewSession> sessions =
                 interviewRepository.findAllByUserIdOrderByStartedAtDesc(userId);

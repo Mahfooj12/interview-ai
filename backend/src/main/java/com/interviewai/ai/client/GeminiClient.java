@@ -1,13 +1,8 @@
 package com.interviewai.ai.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.interviewai.ai.client.dto.ChatChoice;
-import com.interviewai.ai.client.dto.ChatCompletionResponse;
-import com.interviewai.ai.client.dto.ChatMessage;
-import com.interviewai.ai.client.dto.ChatUsage;
-import com.interviewai.ai.client.gemini.dto.GeminiRequest;
-import com.interviewai.ai.client.gemini.dto.GeminiResponse;
-import com.interviewai.exception.BadRequestException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.interviewai.ai.client.dto.ChatChoice;
+import com.interviewai.ai.client.dto.ChatCompletionResponse;
+import com.interviewai.ai.client.dto.ChatMessage;
+import com.interviewai.ai.client.dto.ChatUsage;
+import com.interviewai.ai.client.gemini.dto.GeminiRequest;
+import com.interviewai.ai.client.gemini.dto.GeminiResponse;
+import com.interviewai.exception.BadRequestException;
 
 /**
  * Google Gemini implementation of {@link AiClient}.
@@ -35,17 +35,14 @@ public class GeminiClient implements AiClient {
     private static final Logger log = LoggerFactory.getLogger(GeminiClient.class);
 
     private final RestClient client;
-    private final ObjectMapper objectMapper;
     private final String model;
     private final String apiKey;
 
     public GeminiClient(
             RestClient.Builder builder,
-            ObjectMapper objectMapper,
             @Value("${app.ai.gemini.api-key:}") String apiKey,
             @Value("${app.ai.gemini.base-url:https://generativelanguage.googleapis.com}") String baseUrl,
             @Value("${app.ai.gemini.model:gemini-2.0-flash}") String model) {
-        this.objectMapper = objectMapper;
         this.model = model;
         this.apiKey = apiKey;
         this.client = builder.baseUrl(baseUrl).build();

@@ -1,6 +1,8 @@
 package com.interviewai.repository;
 
 import com.interviewai.model.JobDescription;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -14,6 +16,9 @@ public interface JobDescriptionRepository extends MongoRepository<JobDescription
 
     @Query("{ 'userId': ?0 }")
     List<JobDescription> findAllByUserId(String userId, Sort sort);
+
+    @Query("{ 'userId': ?0 }")
+    Page<JobDescription> findAllByUserId(String userId, Pageable pageable);
 
     default List<JobDescription> findAllByUserIdOrderByCreatedAtDesc(String userId) {
         return findAllByUserId(userId, Sort.by(Sort.Direction.DESC, "createdAt"));

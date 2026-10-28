@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.Instant;
@@ -45,6 +46,7 @@ public class InterviewSession extends BaseAudit {
     private Difficulty difficulty;
     private Personality personality;
 
+    @Indexed
     private Status status;
 
     @Builder.Default private InterviewState state = new InterviewState();

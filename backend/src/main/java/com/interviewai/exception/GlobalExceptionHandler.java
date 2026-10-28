@@ -45,6 +45,31 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException ex, HttpServletRequest req) {
         return build(HttpStatus.FORBIDDEN, "Access denied", "ACCESS_DENIED", req);
     }
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleTypeMismatch(
+            org.springframework.web.method.annotation.MethodArgumentTypeMismatchException ex,
+            HttpServletRequest req) {
+        String param = ex.getName();
+        String value = ex.getValue() != null ? ex.getValue().toString() : "?";
+        String msg = "Invalid value '" + value + "' for parameter '" + param + "'";
+        return build(HttpStatus.BAD_REQUEST, msg, "INVALID_PARAMETER", req);
+    }
+    @ExceptionHandler(org.springframework.dao.DuplicateKeyException.class)
+    public ResponseEntity<ApiError> handleDuplicate(
+            org.springframework.dao.DuplicateKeyException ex,
+            HttpServletRequest req) {
+        log.warn("Duplicate key: {}", ex.getMessage());
+        return build(HttpStatus.CONFLICT, "Resource already exists", "DUPLICATE_RESOURCE", req);
+    }
+
+    @ExceptionHandler(org.springframework.web.bind.MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiError> handleMissingParam(
+            org.springframework.web.bind.MissingServletRequestParameterException ex,
+            HttpServletRequest req) {
+        return build(HttpStatus.BAD_REQUEST,
+                "Missing required parameter '" + ex.getParameterName() + "'",
+                "MISSING_PARAMETER", req);
+    }
 
     @ExceptionHandler(FileStorageException.class)
     public ResponseEntity<ApiError> handleFileStorage(FileStorageException ex, HttpServletRequest req) {

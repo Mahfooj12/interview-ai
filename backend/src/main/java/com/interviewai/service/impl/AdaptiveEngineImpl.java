@@ -24,7 +24,7 @@ public class AdaptiveEngineImpl implements AdaptiveEngine {
         int asked = askedQuestions.size();
 
         // Hard stop
-        if (asked >= Math.max(MAX_QUESTIONS, maxQuestions)) {
+        if (asked >= Math.min(MAX_QUESTIONS, maxQuestions)) {
             return new Decision(false, true, "Maximum number of questions reached", session.getDifficulty());
         }
 

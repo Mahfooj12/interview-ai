@@ -1,10 +1,12 @@
 package com.interviewai.service;
 
+import com.interviewai.dto.common.PageResponse;
 import com.interviewai.dto.job.JobDescriptionRequest;
 import com.interviewai.dto.job.JobDescriptionResponse;
 import com.interviewai.dto.job.JobDescriptionSummaryResponse;
 import com.interviewai.dto.job.JobMatchResponse;
 import com.interviewai.model.JobDescription;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,6 +18,8 @@ public interface JobDescriptionService {
     JobDescriptionResponse createFromFile(String userId, MultipartFile file, String resumeId);
 
     List<JobDescriptionSummaryResponse> list(String userId);
+
+    PageResponse<JobDescriptionSummaryResponse> listPaged(String userId, Pageable pageable);
 
     JobDescriptionResponse get(String userId, String id);
 

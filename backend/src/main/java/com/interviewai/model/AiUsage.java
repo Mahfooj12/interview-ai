@@ -52,5 +52,6 @@ public class AiUsage {
 
     private String errorMessage;
 
+    @Indexed
     private Instant createdAt;
 }

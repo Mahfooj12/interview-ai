@@ -24,6 +24,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.interviewai.dto.job.CreateJobResponse;
+import com.interviewai.model.InterviewGenerationJob;
+import com.interviewai.service.JobService;
+import com.interviewai.worker.InterviewGenerationWorker;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/interviews")
@@ -31,9 +36,38 @@ import org.springframework.web.bind.annotation.RestController;
 public class InterviewController {
 
     private final InterviewService interviewService;
+    private final JobService jobService;
+    private final InterviewGenerationWorker worker;
 
-    public InterviewController(InterviewService interviewService) {
+    public InterviewController(InterviewService interviewService,
+                                 JobService jobService,
+                                 InterviewGenerationWorker worker
+    ) {
         this.interviewService = interviewService;
+        this.jobService = jobService;
+        this.worker = worker;
+    }
+
+    @PostMapping("/{id}/start-async")
+    @Operation(summary = "Start an interview asynchronously (returns jobId)")
+    public ResponseEntity<ApiResponse<CreateJobResponse>> startAsync(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @PathVariable String id) {
+                
+        interviewService.getOwned(user.getId(), id);
+
+        InterviewGenerationJob job = jobService.createJob(user.getId(), id);
+        worker.process(job.getId());   // fire-and-forget (async)
+
+        CreateJobResponse response = CreateJobResponse.builder()
+                .jobId(job.getId())
+                .status(job.getStatus().name())
+                .createdAt(job.getCreatedAt())
+                .statusUrl("/api/interview-jobs/" + job.getId())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(ApiResponse.ok(response, "Job accepted"));
     }
 
     @PostMapping

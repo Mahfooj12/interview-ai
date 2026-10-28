@@ -89,7 +89,7 @@ export default function DashboardPage() {
         <StatCard
           label="Resumes"
           value={resumes?.length ?? 0}
-          hint={`${jobs?.length ?? 0} job descriptions`}
+          hint={`${jobs?.content?.length ?? 0} job descriptions`}
         />
       </div>
 

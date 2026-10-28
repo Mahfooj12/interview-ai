@@ -1,8 +1,11 @@
 package com.interviewai.service;
 
+import com.interviewai.dto.common.PageResponse;
 import com.interviewai.dto.report.GenerateReportResponse;
 import com.interviewai.dto.report.ReportResponse;
 import com.interviewai.dto.report.ReportSummaryResponse;
+import org.springframework.data.domain.Pageable;
+
 
 import java.util.List;
 
@@ -15,4 +18,6 @@ public interface ReportService {
     ReportResponse getByInterview(String userId, String interviewId);
 
     List<ReportSummaryResponse> list(String userId);
+
+    PageResponse<ReportSummaryResponse> listPaged(String userId, Pageable pageable);
 }

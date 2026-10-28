@@ -2,11 +2,20 @@ server:
   port: 0
 
 spring:
+  # Test mein Kafka connection ko disable karne ke liye
+  kafka:
+    listener:
+      auto-startup: false 
+
   data:
     mongodb:
       uri: ${TEST_MONGODB_URI:mongodb://localhost:27017/interviewai_test}
       database: interviewai_test
       auto-index-creation: true
+
+cache:
+  redis:
+    enabled: false
 
 app:
   jwt:
@@ -35,3 +44,4 @@ logging:
   level:
     root: WARN
     com.interviewai: INFO
+    org.springframework: DEBUG

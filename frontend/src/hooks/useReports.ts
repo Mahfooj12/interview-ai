@@ -7,6 +7,7 @@ import { extractApiError } from "@/lib/api/client";
 
 export const reportKeys = {
   all: ["reports"] as const,
+  list: (page: number, size: number) => ["reports", "list", page, size] as const,
   detail: (id: string) => ["reports", id] as const,
   byInterview: (interviewId: string) =>
     ["reports", "by-interview", interviewId] as const,
@@ -14,10 +15,11 @@ export const reportKeys = {
   progressSkills: ["progress", "skills"] as const,
 };
 
-export function useReports() {
+export function useReports(page = 0, size = 20) {
   return useQuery({
-    queryKey: reportKeys.all,
-    queryFn: reportApi.list,
+    queryKey: reportKeys.list(page, size),
+    queryFn: () => reportApi.list({ page, size }),
+    placeholderData: (prev) => prev, // keeps previous page visible during transition
   });
 }
 

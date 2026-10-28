@@ -1,5 +1,6 @@
 package com.interviewai.security;
 
+import com.interviewai.filter.RateLimitFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,17 +25,21 @@ public class SecurityConfig {
     private final RestAuthenticationEntryPoint authenticationEntryPoint;
     private final RestAccessDeniedHandler accessDeniedHandler;
     private final CorsFilter corsFilter;
+    private final RateLimitFilter rateLimitFilter;
+
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
                           CustomUserDetailsService userDetailsService,
                           RestAuthenticationEntryPoint authenticationEntryPoint,
                           RestAccessDeniedHandler accessDeniedHandler,
-                          CorsFilter corsFilter) {
+                          CorsFilter corsFilter,
+                          RateLimitFilter rateLimitFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
         this.corsFilter = corsFilter;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -56,6 +61,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 "/v3/api-docs/**",
+                                "/api/health",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/actuator/health",
@@ -65,6 +71,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(rateLimitFilter, CorsFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

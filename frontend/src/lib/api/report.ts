@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api/client";
 import type { ApiResponse } from "@/lib/api/types";
+import type { PageResponse, PaginationParams } from "@/types/pagination";
 import type {
   ProgressSkill,
   ProgressSummary,
@@ -8,9 +9,17 @@ import type {
 } from "@/types/report";
 
 export const reportApi = {
-  async list(): Promise<ReportSummary[]> {
-    const { data } =
-      await apiClient.get<ApiResponse<ReportSummary[]>>("/api/reports");
+  async list(params: PaginationParams = {}): Promise<PageResponse<ReportSummary>> {
+    const { data } = await apiClient.get<ApiResponse<PageResponse<ReportSummary>>>(
+      "/api/reports",
+      {
+        params: {
+          page: params.page ?? 0,
+          size: params.size ?? 20,
+          sort: params.sort ?? "generatedAt,desc",
+        },
+      },
+    );
     return data.data;
   },
 

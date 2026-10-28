@@ -1,5 +1,6 @@
 import { apiClient } from "@/lib/api/client";
 import type { ApiResponse } from "@/lib/api/types";
+import type { PageResponse, PaginationParams } from "@/types/pagination";
 import type {
   InterviewDifficulty,
   InterviewMode,
@@ -79,9 +80,16 @@ export const adminApi = {
     return data.data;
   },
 
-  async users(): Promise<AdminUser[]> {
-    const { data } = await apiClient.get<ApiResponse<AdminUser[]>>(
+  async users(params: PaginationParams = {}): Promise<PageResponse<AdminUser>> {
+    const { data } = await apiClient.get<ApiResponse<PageResponse<AdminUser>>>(
       "/api/admin/users",
+      {
+        params: {
+          page: params.page ?? 0,
+          size: params.size ?? 20,
+          sort: params.sort ?? "createdAt,desc",
+        },
+      },
     );
     return data.data;
   },
@@ -97,18 +105,30 @@ export const adminApi = {
     return data.data;
   },
 
-  async interviews(limit = 50): Promise<AdminInterview[]> {
-    const { data } = await apiClient.get<ApiResponse<AdminInterview[]>>(
+  async interviews(params: PaginationParams = {}): Promise<PageResponse<AdminInterview>> {
+    const { data } = await apiClient.get<ApiResponse<PageResponse<AdminInterview>>>(
       "/api/admin/interviews",
-      { params: { limit } },
+      {
+        params: {
+          page: params.page ?? 0,
+          size: params.size ?? 50,
+          sort: params.sort ?? "startedAt,desc",
+        },
+      },
     );
     return data.data;
   },
 
-  async aiUsage(limit = 100): Promise<AdminAiUsage[]> {
-    const { data } = await apiClient.get<ApiResponse<AdminAiUsage[]>>(
+  async aiUsage(params: PaginationParams = {}): Promise<PageResponse<AdminAiUsage>> {
+    const { data } = await apiClient.get<ApiResponse<PageResponse<AdminAiUsage>>>(
       "/api/admin/ai-usage",
-      { params: { limit } },
+      {
+        params: {
+          page: params.page ?? 0,
+          size: params.size ?? 50,
+          sort: params.sort ?? "createdAt,desc",
+        },
+      },
     );
     return data.data;
   },

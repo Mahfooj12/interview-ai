@@ -5,18 +5,21 @@ import com.interviewai.dto.admin.AdminInterviewResponse;
 import com.interviewai.dto.admin.AdminStatisticsResponse;
 import com.interviewai.dto.admin.AdminUserResponse;
 import com.interviewai.dto.admin.AdminUserUpdateRequest;
-
-import java.util.List;
+import com.interviewai.dto.common.PageResponse;
+import org.springframework.data.domain.Pageable;
 
 public interface AdminService {
 
     AdminStatisticsResponse statistics();
 
-    List<AdminUserResponse> listUsers();
+    // NEW (replaces listUsers)
+    PageResponse<AdminUserResponse> listUsers(Pageable pageable);
 
     AdminUserResponse updateUser(String userId, AdminUserUpdateRequest request);
 
-    List<AdminInterviewResponse> listInterviews(int limit);
+    // NEW (replaces listInterviews(int))
+    PageResponse<AdminInterviewResponse> listInterviews(Pageable pageable);
 
-    List<AdminAiUsageResponse> listAiUsage(int limit);
+    // NEW (replaces listAiUsage(int))
+    PageResponse<AdminAiUsageResponse> listAiUsage(Pageable pageable);
 }

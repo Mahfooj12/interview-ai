@@ -2,8 +2,23 @@ spring:
   data:
     mongodb:
       auto-index-creation: false
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: ${REDIS_SSL:true}
+
+cache:
+  redis:
+    enabled: true
+    progress-ttl-seconds: 120
 
 logging:
   level:
     root: WARN
     com.interviewai: INFO
+    org.springframework.data.redis: WARN
+    
+rate-limit:
+  enabled: ${RATE_LIMIT_ENABLED:true}
